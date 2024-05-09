@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "1.0.0"
+requires-python = ">=3.12"
+name = "text_encoders"
+# dynamic = ["version", "dependencies"]
+dynamic = ["dependencies"]
+description = "A package for encoding text into vectors"
+readme = "README.md"
+authors = [{ name = "collective.ai", email = "info@collectiveai.io" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+
+[tool.setuptools.packages.find]
+include = ["text_encoders"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+# Setuptools SCM configuration for dynamic versioning based on SCM tags
+# [tool.setuptools_scm]
