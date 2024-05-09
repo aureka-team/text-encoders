@@ -37,13 +37,14 @@ COPY .devcontainer/requirements.txt .
 RUN --mount=type=cache,target=/root/.cache \
     pip install -r requirements.txt --break-system-packages
 
-COPY ./src/text_encoders/requirements.txt requirements.txt
+COPY ./requirements.txt requirements.txt
 RUN --mount=type=cache,target=/root/.cache \
     pip install -r requirements.txt --break-system-packages
 
-COPY ./src/text_encoders /tmp/text_encoders
+COPY ./text_encoders /tmp/text_encoders
+COPY ./pyproject.toml /tmp/pyproject.toml
 RUN --mount=type=cache,target=/root/.cache \
-    pip install --no-deps ./text_encoders --break-system-packages
+    pip install . --no-deps --break-system-packages
 
 RUN rm -rf /tmp/*
 
