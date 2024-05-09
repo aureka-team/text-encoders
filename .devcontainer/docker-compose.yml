@@ -1,0 +1,19 @@
+services:
+    text-encoders-devcontainer:
+        network_mode: host
+        image: text-encoders-devcontainer
+        container_name: text-encoders-devcontainer
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+            args:
+                - PYTHON_VERSION
+                - PIP_VERSION
+                - DEVCONTAINER_USER
+        volumes:
+            - ..:/workspace:cached
+            - ../resources/:/resources
+        env_file:
+            - ../.secrets/.env
+        # This keeps the devcontainer running.
+        entrypoint: [ "tail", "-f", "/dev/null" ]
