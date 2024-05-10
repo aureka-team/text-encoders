@@ -21,6 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && apt-get clean \
     && rm -rf /var/tmp/* /var/lib/apt/lists/*
 
+RUN rm /usr/lib/python${PYTHON_VERSION}/EXTERNALLY-MANAGED
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 1 \
     && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 1
 
@@ -35,17 +36,15 @@ RUN wget --no-check-certificate \
 
 COPY .devcontainer/requirements.txt .
 RUN --mount=type=cache,target=/root/.cache \
-    pip install -r requirements.txt --break-system-packages
+    pip install -r requirements.txt
 
 COPY ./requirements.txt requirements.txt
 RUN --mount=type=cache,target=/root/.cache \
-    pip install -r requirements.txt --break-system-packages
+    pip install -r requirements.txt
 
 COPY ./text_encoders /tmp/text_encoders
 COPY ./pyproject.toml /tmp/pyproject.toml
-RUN --mount=type=cache,target=/root/.cache \
-    pip install . --no-deps --break-system-packages
-
+RUN --mount=type=cache,target=/root/.cache pip install . --no-deps
 RUN rm -rf /tmp/*
 
 ARG DEVCONTAINER_USER
