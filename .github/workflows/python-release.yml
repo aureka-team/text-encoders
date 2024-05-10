@@ -16,7 +16,7 @@ jobs:
             - name: Load .env file
               uses: xom9ikk/dotenv@v2
               with:
-                  path: ./devcontainer/.env
+                  path: .devcontainer/
 
             - name: Set up Python
               uses: actions/setup-python@v2
