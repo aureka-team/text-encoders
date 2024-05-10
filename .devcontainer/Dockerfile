@@ -35,12 +35,10 @@ RUN wget --no-check-certificate \
     && python setup.py install
 
 COPY .devcontainer/requirements.txt .
-RUN --mount=type=cache,target=/root/.cache \
-    pip install -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache pip install -r requirements.txt
 
 COPY ./requirements.txt requirements.txt
-RUN --mount=type=cache,target=/root/.cache \
-    pip install -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache pip install -r requirements.txt
 
 COPY ./text_encoders /tmp/text_encoders
 COPY ./pyproject.toml /tmp/pyproject.toml
