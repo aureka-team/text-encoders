@@ -3,6 +3,6 @@
 **/*.egg-info
 **/.cache
 
-.git/
 notebooks/
 resources/
+build/

@@ -42,7 +42,10 @@ RUN --mount=type=cache,target=/root/.cache pip install -r requirements.txt
 
 COPY ./text_encoders /tmp/text_encoders
 COPY ./pyproject.toml /tmp/pyproject.toml
-RUN --mount=type=cache,target=/root/.cache pip install . --no-deps
+RUN --mount=type=cache,target=/root/.cache \
+    --mount=source=.git,target=.git,type=bind \
+    pip install . --no-deps
+
 RUN rm -rf /tmp/*
 
 ARG DEVCONTAINER_USER
