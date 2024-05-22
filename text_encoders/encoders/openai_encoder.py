@@ -3,8 +3,8 @@ import numpy as np
 from openai import OpenAI
 from typing import Optional
 
+from common.logger import get_logger
 from text_encoders.meta import TextEncoder
-from text_encoders.logger import get_logger
 
 
 logger = get_logger(__name__)

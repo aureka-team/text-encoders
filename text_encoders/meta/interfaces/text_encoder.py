@@ -10,9 +10,9 @@ from typing import Optional
 from abc import ABC, abstractmethod
 from more_itertools import chunked, flatten
 
-from text_encoders.logger import get_logger
-from text_encoders.utils.path import create_path
-from text_encoders.utils.h5_files import save_h5, load_h5
+from common.logger import get_logger
+from common.utils.path import create_path
+from common.utils.h5_data import save_h5, load_h5
 
 
 logger = get_logger(__name__)
