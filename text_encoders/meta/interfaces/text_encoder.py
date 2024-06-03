@@ -83,8 +83,8 @@ class TextEncoder(ABC):
     ) -> np.ndarray:
         async with self.semaphore:
             vectors = await asyncio.to_thread(self.encode, texts)
-
             pbar.update(1)
+
             return vectors
 
     async def async_batch_encode(self, texts: list[str]) -> np.ndarray:
