@@ -49,7 +49,7 @@ class WeaviateCache:
                     name="text",
                     data_type=DataType.TEXT,
                     skip_vectorization=True,
-                    tokenization=Tokenization.LOWERCASE,
+                    tokenization=Tokenization.WORD,
                 )
             ],
         )
