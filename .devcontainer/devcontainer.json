@@ -2,6 +2,9 @@
 	"name": "text-encoders",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "text-encoders-devcontainer",
+	"runServices": [
+		"text-encoders-devcontainer"
+	],
 	"workspaceFolder": "/workspace",
 	"customizations": {
 		"vscode": {

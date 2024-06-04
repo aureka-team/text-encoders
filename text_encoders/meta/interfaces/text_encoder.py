@@ -3,16 +3,13 @@ import asyncio
 import numpy as np
 
 from tqdm import tqdm
-
-from joblib import hash
 from typing import Optional
 
 from abc import ABC, abstractmethod
 from more_itertools import chunked, flatten
 
 from common.logger import get_logger
-from common.utils.path import create_path
-from common.utils.h5_data import save_h5, load_h5
+from text_encoders.weaviate_cache import WeaviateCache
 
 
 logger = get_logger(__name__)
@@ -23,45 +20,54 @@ class TextEncoder(ABC):
         self,
         batch_size: int = 1024,
         max_concurrency: int = 10,
-        cache_path: Optional[str] = None,
+        weaviate_cache: Optional[WeaviateCache] = None,
     ):
         self.batch_size = batch_size
         self.semaphore = asyncio.Semaphore(max_concurrency)
-        self.cache_path = cache_path
-
-        if cache_path is not None:
-            create_path(path=cache_path)
+        self.weaviate_cache = weaviate_cache
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__class__.__name__
 
     @abstractmethod
     def _encode(self, texts: list[str]) -> np.ndarray:
         pass
 
-    def _get_cache_key(self, texts: list[str]) -> str:
-        model_name_hash = hash(self.model_name)
-        texts_hash = hash(texts)
-        cache_key = hash(f"{model_name_hash}-{texts_hash}")
-
-        return cache_key
-
     def encode(self, texts: list[str]) -> np.ndarray:
-        if self.cache_path is not None:
-            cache_key = self._get_cache_key(texts=texts)
-            loaded_vectors = load_h5(self.cache_path, cache_key)
-            if loaded_vectors is not None:
-                return loaded_vectors
+        if self.weaviate_cache is None:
+            return self._encode(texts=texts)
 
-        vectors = self._encode(texts=texts)
-        if self.cache_path is not None:
-            save_h5(self.cache_path, cache_key, vectors)
+        loaded_vectors = self.weaviate_cache.load(texts=texts)
+        uncached_indexes = {
+            idx for idx, vector in enumerate(loaded_vectors) if vector is None
+        }
 
-        return vectors
+        if not uncached_indexes:
+            return np.array(loaded_vectors)
+
+        uncached_texts = [
+            text for idx, text in enumerate(texts) if idx in uncached_indexes
+        ]
+
+        uncached_vectors = self._encode(texts=uncached_texts)
+        self.weaviate_cache.save(
+            texts=uncached_texts,
+            vectors=uncached_vectors,
+        )
+
+        for idx, uncached_vector in zip(uncached_indexes, uncached_vectors):
+            loaded_vectors[idx] = uncached_vector
+
+        assert len(texts) == len(loaded_vectors)
+        return np.array(loaded_vectors)
 
     def batch_encode(self, texts: list[str]) -> np.ndarray:
         logger.info("generating text vectors...")
+
+        if len(texts) <= self.batch_size:
+            return self.encode(texts=texts)
+
         text_chunks = chunked(texts, self.batch_size)
         chunk_vectors = map(
             self.encode,
@@ -89,6 +95,10 @@ class TextEncoder(ABC):
 
     async def async_batch_encode(self, texts: list[str]) -> np.ndarray:
         logger.info("generating text vectors...")
+
+        if len(texts) <= self.batch_size:
+            return self.encode(texts=texts)
+
         text_chunks = chunked(texts, self.batch_size)
         with tqdm(
             text_chunks,

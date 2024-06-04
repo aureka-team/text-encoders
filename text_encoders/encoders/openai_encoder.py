@@ -5,6 +5,7 @@ from typing import Optional
 
 from common.logger import get_logger
 from text_encoders.meta import TextEncoder
+from text_encoders.weaviate_cache import WeaviateCache
 
 
 logger = get_logger(__name__)
@@ -17,12 +18,12 @@ class OpenAIEncoder(TextEncoder):
         max_concurrency: int = 5,
         model_name: str = "text-embedding-3-large",
         dimensions: int = 1024,
-        cache_path: Optional[str] = "/resources/cache/embeddings",
+        weaviate_cache: Optional[WeaviateCache] = None,
     ):
         super().__init__(
             batch_size=batch_size,
             max_concurrency=max_concurrency,
-            cache_path=cache_path,
+            weaviate_cache=weaviate_cache,
         )
 
         self.openai_client = OpenAI()
