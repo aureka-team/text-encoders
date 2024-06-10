@@ -1,3 +1,4 @@
+import os
 import weaviate
 
 import numpy as np
@@ -12,6 +13,10 @@ from weaviate.classes.config import (
 )
 
 
+WEAVIATE_HOST = os.getenv("WEAVIATE_HOST", "localhost")
+WEAVIATE_PORT = int(os.getenv("WEAVIATE_PORT", "8080"))
+
+
 logger = get_logger(__name__)
 
 
@@ -19,8 +24,8 @@ class WeaviateCache:
     def __init__(
         self,
         collection_name: str = "WeaviateCache",
-        weaviate_host: str = "localhost",
-        weaviate_port: int = 8181,
+        weaviate_host: str = WEAVIATE_HOST,
+        weaviate_port: int = WEAVIATE_PORT,
     ):
         self.collection_name = collection_name
         self.weaviate_client = weaviate.connect_to_local(
