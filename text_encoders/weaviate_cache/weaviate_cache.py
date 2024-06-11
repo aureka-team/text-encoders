@@ -15,6 +15,7 @@ from weaviate.classes.config import (
 
 WEAVIATE_HOST = os.getenv("WEAVIATE_HOST", "localhost")
 WEAVIATE_PORT = int(os.getenv("WEAVIATE_PORT", "8080"))
+WEAVIATE_GRPC_PORT = int(os.getenv("WEAVIATE_GRPC_PORT", "50051"))
 
 
 logger = get_logger(__name__)
@@ -26,11 +27,13 @@ class WeaviateCache:
         collection_name: str = "WeaviateCache",
         weaviate_host: str = WEAVIATE_HOST,
         weaviate_port: int = WEAVIATE_PORT,
+        weaviate_grpc_port: int = WEAVIATE_GRPC_PORT,
     ):
         self.collection_name = collection_name
         self.weaviate_client = weaviate.connect_to_local(
             host=weaviate_host,
             port=weaviate_port,
+            grpc_port=weaviate_grpc_port,
         )
 
         self._crate_collection()

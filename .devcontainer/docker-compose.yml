@@ -18,17 +18,16 @@ services:
         env_file:
             - ../.secrets/.env
         # This keeps the devcontainer running.
-        entrypoint: [ "tail", "-f", "/dev/null" ]
+        entrypoint: [ 'tail', '-f', '/dev/null' ]
 
     text-encoders-weaviate:
         image: cr.weaviate.io/semitechnologies/weaviate:${WEAVIATE_VERSION}
         container_name: text-encoders-weaviate
-        network_mode: host
         command:
             - --host
             - 0.0.0.0
             - --port
-            - "${WEAVIATE_PORT}"
+            - '8080'
             - --scheme
             - http
         volumes:
@@ -40,6 +39,10 @@ services:
             DEFAULT_VECTORIZER_MODULE: 'none'
             ENABLE_MODULES: ''
             AUTOSCHEMA_ENABLED: 'false'
+            CLUSTER_HOSTNAME: 'node1'
+        ports:
+            - ${WEAVIATE_PORT}:8080
+            - ${WEAVIATE_GRPC_PORT}:50051
         deploy:
             resources:
                 limits:
