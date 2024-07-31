@@ -1,5 +1,4 @@
 import os
-import weaviate
 
 import numpy as np
 import weaviate.classes as wvc
@@ -8,9 +7,8 @@ from common.logger import get_logger
 
 from weaviate import WeaviateClient
 from weaviate.util import generate_uuid5
-from weaviate.config import ConnectionConfig
 from weaviate.connect import ConnectionParams
-from weaviate.classes.init import AdditionalConfig
+from weaviate.config import ConnectionConfig, AdditionalConfig
 from weaviate.classes.config import (
     Property,
     DataType,
@@ -53,13 +51,8 @@ class WeaviateCache:
             skip_init_checks=True,
         )
 
+        self.weaviate_client.connect()
         self.collection_name = collection_name
-        self.weaviate_client = weaviate.connect_to_local(
-            host=weaviate_host,
-            port=weaviate_port,
-            grpc_port=weaviate_grpc_port,
-        )
-
         self._crate_collection()
 
     def __del__(self) -> None:
