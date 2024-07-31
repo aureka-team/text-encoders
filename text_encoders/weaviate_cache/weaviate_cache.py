@@ -5,7 +5,12 @@ import numpy as np
 import weaviate.classes as wvc
 
 from common.logger import get_logger
+
+from weaviate import WeaviateClient
 from weaviate.util import generate_uuid5
+from weaviate.config import ConnectionConfig
+from weaviate.connect import ConnectionParams
+from weaviate.classes.init import AdditionalConfig
 from weaviate.classes.config import (
     Property,
     DataType,
@@ -28,7 +33,26 @@ class WeaviateCache:
         weaviate_host: str = WEAVIATE_HOST,
         weaviate_port: int = WEAVIATE_PORT,
         weaviate_grpc_port: int = WEAVIATE_GRPC_PORT,
+        max_connections: int = 128,
     ):
+        self.weaviate_client = WeaviateClient(
+            connection_params=ConnectionParams.from_params(
+                http_host=weaviate_host,
+                http_port=weaviate_port,
+                http_secure=False,
+                grpc_host=weaviate_host,
+                grpc_port=weaviate_grpc_port,
+                grpc_secure=False,
+            ),
+            additional_config=AdditionalConfig(
+                connection=ConnectionConfig(
+                    session_pool_connections=max_connections,
+                    session_pool_maxsize=max_connections,
+                )
+            ),
+            skip_init_checks=True,
+        )
+
         self.collection_name = collection_name
         self.weaviate_client = weaviate.connect_to_local(
             host=weaviate_host,
@@ -63,10 +87,7 @@ class WeaviateCache:
         )
 
     def _clear_cache(self) -> None:
-        logger.warning(
-            f"deleting weaviate collection => {self.collection_name}"
-        )
-
+        logger.warning(f"deleting weaviate collection => {self.collection_name}")
         self.weaviate_client.collections.delete(self.collection_name)
 
     def save(self, texts: list[str], vectors: np.ndarray) -> None:
