@@ -1,4 +1,4 @@
-openai>=1.37.1
+openai>=1.38.0
 weaviate-client>=4.7.1
 
 common @ git+https://git@github.com/collectiveai-team/common.git@v1.0.10
