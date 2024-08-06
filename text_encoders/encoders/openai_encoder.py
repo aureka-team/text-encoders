@@ -3,6 +3,9 @@ import numpy as np
 from openai import OpenAI
 from typing import Optional
 
+from more_itertools import flatten
+from tiktoken import encoding_for_model
+
 from common.logger import get_logger
 from text_encoders.meta import TextEncoder
 from text_encoders.weaviate_cache import WeaviateCache
@@ -19,6 +22,7 @@ class OpenAIEncoder(TextEncoder):
         model_name: str = "text-embedding-3-large",
         dimensions: int = 1024,
         weaviate_cache: Optional[WeaviateCache] = None,
+        tokenizer_model: str = "gpt-4o",
     ):
         super().__init__(
             batch_size=batch_size,
@@ -29,6 +33,11 @@ class OpenAIEncoder(TextEncoder):
         self.openai_client = OpenAI()
         self.model_name = model_name
         self.dimensions = dimensions
+        self.tokenizer = encoding_for_model(tokenizer_model)
+
+    def _get_n_tokens(self, texts: list[str]) -> int:
+        tokens = self.tokenizer.encode_batch(texts)
+        return len(list(flatten(tokens)))
 
     def _encode(self, texts: list[str]) -> np.ndarray:
         response = self.openai_client.embeddings.create(

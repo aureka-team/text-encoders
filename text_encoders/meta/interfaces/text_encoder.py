@@ -31,6 +31,10 @@ class TextEncoder(ABC):
         return self.__class__.__name__
 
     @abstractmethod
+    def _get_n_tokens(self, texts: list[str]) -> int:
+        pass
+
+    @abstractmethod
     def _encode(self, texts: list[str]) -> np.ndarray:
         pass
 
@@ -63,8 +67,7 @@ class TextEncoder(ABC):
         return np.array(loaded_vectors)
 
     def batch_encode(self, texts: list[str]) -> np.ndarray:
-        logger.info("generating text vectors...")
-
+        n_tokens = self._get_n_tokens(texts=texts)
         if len(texts) <= self.batch_size:
             return self.encode(texts=texts)
 
@@ -74,6 +77,7 @@ class TextEncoder(ABC):
             tqdm(
                 text_chunks,
                 total=(len(texts) // self.batch_size),
+                desc=f"encoding {n_tokens} tokens",
                 ascii=" ##",
                 colour="#808080",
             ),
@@ -94,8 +98,7 @@ class TextEncoder(ABC):
             return vectors
 
     async def async_batch_encode(self, texts: list[str]) -> np.ndarray:
-        logger.info("generating text vectors...")
-
+        n_tokens = self._get_n_tokens(texts=texts)
         if len(texts) <= self.batch_size:
             return self.encode(texts=texts)
 
@@ -103,10 +106,10 @@ class TextEncoder(ABC):
         with tqdm(
             text_chunks,
             total=(len(texts) // self.batch_size),
+            desc=f"encoding {n_tokens} tokens",
             ascii=" ##",
             colour="#808080",
         ) as pbar:
-
             async_tasks = [
                 self.async_encode(texts, pbar=pbar) for texts in text_chunks
             ]

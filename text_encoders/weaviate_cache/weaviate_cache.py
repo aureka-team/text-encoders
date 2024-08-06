@@ -80,7 +80,9 @@ class WeaviateCache:
         )
 
     def _clear_cache(self) -> None:
-        logger.warning(f"deleting weaviate collection => {self.collection_name}")
+        logger.warning(
+            f"deleting weaviate collection => {self.collection_name}"
+        )
         self.weaviate_client.collections.delete(self.collection_name)
 
     def save(self, texts: list[str], vectors: np.ndarray) -> None:
