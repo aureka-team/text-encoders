@@ -89,11 +89,12 @@ class TextEncoder(ABC):
     async def async_encode(
         self,
         texts: list[str],
-        pbar: tqdm,
+        pbar: tqdm | None = None,
     ) -> np.ndarray:
         async with self.semaphore:
             vectors = await asyncio.to_thread(self.encode, texts)
-            pbar.update(1)
+            if pbar is not None:
+                pbar.update(1)
 
             return vectors
 

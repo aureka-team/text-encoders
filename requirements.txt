@@ -1,6 +1,6 @@
-openai>=1.51.0
+openai>=1.54.0
 tiktoken>=0.8.0
-weaviate-client>=4.8.1
+weaviate-client>=4.9.3
 numpy<2.0.0
 
 common @ git+https://git@github.com/aureka-team/common.git@v1.1.0

@@ -8,7 +8,7 @@ name = "text_encoders"
 dynamic = ["version", "dependencies"]
 description = "Text Encoders"
 readme = "README.md"
-authors = [{ name = "Bas", email = "bas@collectiveai.io" }]
+authors = [{ name = "Bas", email = "bastiansg.bas@gmail.com" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
