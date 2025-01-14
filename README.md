@@ -39,7 +39,7 @@ from text_encoders.weaviate_cache import WeaviateCache
 ### Setting Up the Encoder
 
 ```python
-weaviate_cache = WeaviateCache()  # Initialize the embedding cache.
+weaviate_cache = WeaviateCache()  # Optional: Initialize the embedding cache.
 openai_encoder = OpenAIEncoder(
     batch_size=1024,  # Number of texts processed in each batch.
     max_concurrency=10,  # Maximum number of concurrent asynchronous requests.
