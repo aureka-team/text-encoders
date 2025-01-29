@@ -1,6 +1,6 @@
-openai>=1.55.3
+openai>=1.60.2
 tiktoken>=0.8.0
-weaviate-client>=4.9.5
+weaviate-client>=4.9.6
 numpy<2.0.0
 # numpy >= 2.1.3
 

@@ -1,7 +1,7 @@
 import numpy as np
 
-from openai import OpenAI
 from typing import Optional
+from openai import OpenAI, BadRequestError
 
 from more_itertools import flatten
 from tiktoken import encoding_for_model
@@ -40,11 +40,31 @@ class OpenAIEncoder(TextEncoder):
         return len(list(flatten(tokens)))
 
     def _encode(self, texts: list[str]) -> np.ndarray:
-        response = self.openai_client.embeddings.create(
-            input=texts,
-            model=self.model_name,
-            dimensions=self.dimensions,
-        )
+        try:
+            response = self.openai_client.embeddings.create(
+                input=texts,
+                model=self.model_name,
+                dimensions=self.dimensions,
+            )
+
+        except BadRequestError as error:
+            texts_n_tokens = (
+                {
+                    "text": text,
+                    "n_tokens": self._get_n_tokens(texts=[text]),
+                }
+                for text in texts
+            )
+
+            sorted_texts_n_tokens = sorted(
+                texts_n_tokens, key=lambda x: x["n_tokens"], reverse=True
+            )
+
+            logger.error(
+                f"error encoding texts, longest text => {sorted_texts_n_tokens[0]}"
+            )
+
+            raise error
 
         embeddings = [data_item.embedding for data_item in response.data]
         embeddings = np.array(embeddings)
