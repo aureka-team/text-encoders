@@ -31,7 +31,7 @@ class TextEncoder(ABC):
         return self.__class__.__name__
 
     @abstractmethod
-    def _get_n_tokens(self, texts: list[str]) -> int:
+    def _get_num_tokens(self, texts: list[str]) -> int:
         pass
 
     @abstractmethod
@@ -67,7 +67,7 @@ class TextEncoder(ABC):
         return np.array(loaded_vectors)
 
     def batch_encode(self, texts: list[str]) -> np.ndarray:
-        n_tokens = self._get_n_tokens(texts=texts)
+        n_tokens = self._get_num_tokens(texts=texts)
         if len(texts) <= self.batch_size:
             return self.encode(texts=texts)
 
@@ -99,7 +99,7 @@ class TextEncoder(ABC):
             return vectors
 
     async def async_batch_encode(self, texts: list[str]) -> np.ndarray:
-        n_tokens = self._get_n_tokens(texts=texts)
+        n_tokens = self._get_num_tokens(texts=texts)
         if len(texts) <= self.batch_size:
             return self.encode(texts=texts)
 

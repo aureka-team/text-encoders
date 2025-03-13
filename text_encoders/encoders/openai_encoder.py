@@ -21,6 +21,7 @@ class OpenAIEncoder(TextEncoder):
         max_concurrency: int = 5,
         model_name: str = "text-embedding-3-large",
         dimensions: int = 1024,
+        timeout: int = 10,
         weaviate_cache: Optional[WeaviateCache] = None,
         tokenizer_model: str = "gpt-4o",
     ):
@@ -30,12 +31,12 @@ class OpenAIEncoder(TextEncoder):
             weaviate_cache=weaviate_cache,
         )
 
-        self.openai_client = OpenAI()
+        self.openai_client = OpenAI(timeout=timeout)
         self.model_name = model_name
         self.dimensions = dimensions
         self.tokenizer = encoding_for_model(tokenizer_model)
 
-    def _get_n_tokens(self, texts: list[str]) -> int:
+    def _get_num_tokens(self, texts: list[str]) -> int:
         tokens = self.tokenizer.encode_batch(texts)
         return len(list(flatten(tokens)))
 
@@ -51,13 +52,15 @@ class OpenAIEncoder(TextEncoder):
             texts_n_tokens = (
                 {
                     "text": text,
-                    "n_tokens": self._get_n_tokens(texts=[text]),
+                    "n_tokens": self._get_num_tokens(texts=[text]),
                 }
                 for text in texts
             )
 
             sorted_texts_n_tokens = sorted(
-                texts_n_tokens, key=lambda x: x["n_tokens"], reverse=True
+                texts_n_tokens,
+                key=lambda x: x["n_tokens"],
+                reverse=True,
             )
 
             logger.error(
@@ -67,6 +70,4 @@ class OpenAIEncoder(TextEncoder):
             raise error
 
         embeddings = [data_item.embedding for data_item in response.data]
-        embeddings = np.array(embeddings)
-
-        return embeddings
+        return np.array(embeddings)
